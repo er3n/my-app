@@ -12,7 +12,13 @@ export default class TodoContainer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      todos: ['first todo', 'second todo', 'third todo'],
+      todos: [
+        {
+          id: Date.now(),
+          text: 'My first todo',
+          isCompleted: false,
+        },
+      ],
     };
   }
 
@@ -27,9 +33,22 @@ export default class TodoContainer extends React.Component {
 
   deleteTodo = id => {
     const todos = this.state.todos;
-    todos.splice(id, 1);
+    const newTodos = todos.filter(item => item.id !== id);
     this.setState({
-      todos: todos,
+      todos: newTodos,
+    });
+  };
+
+  changeTodoStatus = (id, isComplete) => {
+    const todos = this.state.todos;
+    const newTodos = todos.map(item => {
+      if (item.id === id) {
+        item.isCompleted = isComplete;
+      }
+      return item;
+    });
+    this.setState({
+      todos: newTodos,
     });
   };
 
@@ -40,6 +59,7 @@ export default class TodoContainer extends React.Component {
         <TodoListContainer
           todos={this.state.todos}
           onClickDelete={this.deleteTodo}
+          onClickChangeStatus={this.changeTodoStatus}
         />
       </div>
     );

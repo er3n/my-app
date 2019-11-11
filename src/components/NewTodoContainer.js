@@ -43,7 +43,11 @@ export default class NewTodoContainer extends React.Component {
   };
 
   onClickAddTodo = () => {
-    this.props.onClick(this.state.newTodo);
+    this.props.onClick({
+      id: Date.now(),
+      text: this.state.newTodo,
+      isCompleted: false,
+    });
     this.setState({
       newTodo: '',
     });
@@ -63,7 +67,11 @@ export default class NewTodoContainer extends React.Component {
           />
         </div>
         <div>
-          <button style={addButtonStyle} onClick={this.onClickAddTodo}>
+          <button
+            style={addButtonStyle}
+            onClick={this.onClickAddTodo}
+            disabled={!this.state.newTodo}
+          >
             Add
           </button>
         </div>

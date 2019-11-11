@@ -18,14 +18,12 @@ export default class TodoListContainer extends React.Component {
     return (
       <div style={todoListContainerStyle}>
         <Header>Let's get some work done!</Header>
-        {this.props.todos.map((item, index) => (
+        {this.props.todos.map(item => (
           <TodoItem
-            key={index}
-            todo={{
-              id: index,
-              text: item,
-            }}
+            key={item.id}
+            todo={item}
             onClickDelete={this.props.onClickDelete}
+            onClickChangeStatus={this.props.onClickChangeStatus}
           />
         ))}
       </div>
