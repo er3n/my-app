@@ -1,6 +1,14 @@
 import React from 'react';
 import NewTodoContainer from './NewTodoContainer';
 import TodoListContainer from './TodoListContainer';
+import {
+  getTodos,
+  addTodo,
+  deleteTodo,
+  completeTodo,
+  redoTodo,
+} from '../api/todos-api';
+import Loader from './Loader';
 
 const mainContainerStyle = {
   background: 'grey',
@@ -12,56 +20,60 @@ export default class TodoContainer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      todos: [
-        {
-          id: Date.now(),
-          text: 'My first todo',
-          isCompleted: false,
-        },
-      ],
+      todos: null,
+      isLoading: true,
     };
   }
 
-  onAddTodo = todo => {
-    const todos = this.state.todos;
-    todos.push(todo);
-    this.setState({
-      todos: todos,
+  componentDidMount() {
+    this.loadTodos();
+  }
+
+  loadTodos = () => {
+    getTodos().then(res => {
+      this.setState({
+        todos: res.data,
+        isLoading: false,
+      });
     });
-    console.log(todos);
   };
 
-  deleteTodo = id => {
-    const todos = this.state.todos;
-    const newTodos = todos.filter(item => item.id !== id);
-    this.setState({
-      todos: newTodos,
+  onAddTodo = todo => {
+    addTodo(todo).then(() => {
+      this.loadTodos();
+    });
+  };
+
+  onDeleteTodo = id => {
+    deleteTodo(id).then(() => {
+      this.loadTodos();
     });
   };
 
   changeTodoStatus = (id, isComplete) => {
-    const todos = this.state.todos;
-    const newTodos = todos.map(item => {
-      if (item.id === id) {
-        item.isCompleted = isComplete;
-      }
-      return item;
-    });
-    this.setState({
-      todos: newTodos,
+    let completeTodoResolve;
+    if (isComplete) {
+      completeTodoResolve = completeTodo(id);
+    } else {
+      completeTodoResolve = redoTodo(id);
+    }
+    completeTodoResolve.then(() => {
+      this.loadTodos();
     });
   };
 
   render() {
     return (
-      <div style={mainContainerStyle}>
-        <NewTodoContainer onClick={this.onAddTodo} />
-        <TodoListContainer
-          todos={this.state.todos}
-          onClickDelete={this.deleteTodo}
-          onClickChangeStatus={this.changeTodoStatus}
-        />
-      </div>
+      <Loader isLoading={this.state.isLoading}>
+        <div style={mainContainerStyle}>
+          <NewTodoContainer onClick={this.onAddTodo} />
+          <TodoListContainer
+            todos={this.state.todos}
+            onClickDelete={this.onDeleteTodo}
+            onClickChangeStatus={this.changeTodoStatus}
+          />
+        </div>
+      </Loader>
     );
   }
 }
