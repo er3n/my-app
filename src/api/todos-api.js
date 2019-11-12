@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseUrl = '/api';
+const baseUrl = 'https://simplistic-kick.glitch.me/api';
 
 export const getTodos = () => {
   return axios.get(`${baseUrl}/todos`);
